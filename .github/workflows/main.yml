@@ -20,6 +20,11 @@ jobs:
           channel: "stable"
       - run: flutter doctor -v
 
+      - name: Set up Gradle
+        run: |
+          echo "org.gradle.jvmargs=-Xmx2048m" >> $GITHUB_WORKSPACE/android/gradle.properties
+
+
       - name: Checkout flutter_app code
         uses: actions/checkout@v2
 
@@ -30,7 +35,7 @@ jobs:
         run: mkdir -p apk
 
       - name: Build APK
-        run: flutter build apk --split-per-abi --release
+        run: flutter build apk --release
 
       - name: Move APK Files to 'apk' Folder
         run: mv build/app/outputs/apk/release/*.apk apk/
