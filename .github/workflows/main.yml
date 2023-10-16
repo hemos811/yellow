@@ -35,7 +35,7 @@ jobs:
         run: mkdir -p apk
 
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --debug
 
       - name: Move APK Files to 'apk' Folder
         run: mv build/app/outputs/apk/release/*.apk apk/
