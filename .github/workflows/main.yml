@@ -26,13 +26,13 @@ jobs:
       - name: Install Flutter dependencies
         run: flutter pub get
 
-      - name: Create APK Folder
+      - name: Create 'apk' Folder if Not Exist
         run: mkdir -p apk
 
       - name: Build APK
         run: flutter build apk --split-per-abi --release
 
-      - name: Move APK Files to Repository
+      - name: Move APK Files to 'apk' Folder
         run: mv build/app/outputs/apk/release/*.apk apk/
 
       - name: Commit APKs to Repository
@@ -47,7 +47,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Access APKs
+      - name: Access 'apk' Folder and APKs
         run: |
-          # Now you can access the APK files from the 'apk' folder in your repository
+          # Create 'apk' folder if it doesn't exist
+          mkdir -p apk
+          
+          # Now you can access the 'apk' folder and APK files
           ls apk/
