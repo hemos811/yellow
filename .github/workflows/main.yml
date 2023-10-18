@@ -8,11 +8,30 @@ on:
       - 'package-name.txt' # Specify the path to the package name file
 
 jobs:
-  change_package_name:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+      - run: flutter doctor -v
+
+      - name: Set up Gradle
+        run: |
+          echo "org.gradle.jvmargs=-Xmx2048m" >> $GITHUB_WORKSPACE/android/gradle.properties
+
+      - name: Checkout flutter_app code
+        uses: actions/checkout@v2
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Create 'apk' Folder if Not Exist
+        run: mkdir -p apk
 
       - name: Check if package-name.txt has changed
         id: check-file-change
@@ -37,32 +56,6 @@ jobs:
           # Use the stored environment variable to change the package name
           flutter pub run change_app_package_name:main $PACKAGE_NAME
 
-  build:
-    runs-on: ubuntu-latest
-    needs: change_package_name
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-      - run: flutter doctor -v
-
-      - name: Set up Gradle
-        run: |
-          echo "org.gradle.jvmargs=-Xmx2048m" >> $GITHUB_WORKSPACE/android/gradle.properties
-
-      - name: Checkout flutter_app code
-        uses: actions/checkout@v2
-
-      - name: Install Flutter dependencies
-        run: flutter pub get
-
-      - name: Create 'apk' Folder if Not Exist
-        run: mkdir -p apk
-
       # Use a conditional check to skip these steps for specific tags
       - name: Build APK
         run: flutter build apk --debug
@@ -72,7 +65,7 @@ jobs:
 
   commit_and_push:
     runs-on: ubuntu-latest
-    needs: [change_package_name, build]
+    needs: build
 
     steps:
       - uses: actions/checkout@v2
