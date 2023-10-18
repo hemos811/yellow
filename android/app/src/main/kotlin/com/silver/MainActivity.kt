@@ -1,4 +1,4 @@
-package com.gold
+package com.silver
 
 import io.flutter.embedding.android.FlutterActivity
 

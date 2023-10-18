@@ -45,21 +45,22 @@ jobs:
       - name: Read data from a file
         if: steps.check-file-change.outputs.changed == 'true'
         run: |
-
           # Debug - Check Package Name File
           cat package-name.txt
-
+        
           # Read the data from a file in your repository and store it as an environment variable
           export PACKAGE_NAME=$(<package-name.txt)
+          echo "PACKAGE_NAME is set to: ${PACKAGE_NAME}"
+             
 
       - name: Change Flutter App Package Name
         if: steps.check-file-change.outputs.changed == 'true'
         run: |
           # Debug - Verify the PACKAGE_NAME variable
-          echo "PACKAGE_NAME is set to: $PACKAGE_NAME"
+          echo "PACKAGE_NAME is set to: ${PACKAGE_NAME}"
 
           # Use the stored environment variable to change the package name
-          flutter pub run change_app_package_name:main com.example.purple
+          flutter pub run change_app_package_name:main com.example.violet
 
       - name: Build APK
         run: flutter build apk --debug
@@ -75,17 +76,6 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v2
 
-      - name: Check if package name has changed
-        id: check-package-change
-        run: |
-          if [ -n "$PACKAGE_NAME" ]; then
-            echo "Package name has changed."
-            echo "::set-output name=package_changed::true"
-          else
-            echo "Package name has not changed."
-            echo "::set-output name=package_changed::false"
-          fi
-
       - name: List Changed Files
         run: git status
 
@@ -97,5 +87,5 @@ jobs:
           git add .
           git status  # Added for debugging
           git diff --cached --name-only  # Added for debugging
-          git commit -m "Change package name to $PACKAGE_NAME" || echo "No changes to commit"
+          git commit -m "New Commit Without Dynamic Package Variable"
           git push
