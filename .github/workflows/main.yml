@@ -65,7 +65,6 @@ jobs:
 
       # Use a conditional check to skip these steps for specific tags
       - name: Build APK
-        if: "!contains(github.ref, 'skip-apk-build')"
         run: flutter build apk --debug
 
       - name: Move APK Files to 'apk' Folder
