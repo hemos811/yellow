@@ -52,21 +52,12 @@ jobs:
           export PACKAGE_NAME=$(<package-name.txt)
           echo "PACKAGE_NAME is set to: ${PACKAGE_NAME}"
           flutter pub run change_app_package_name:main $PACKAGE_NAME
-             
-
+            
       - name: Build APK
         run: flutter build apk --debug
 
       - name: Move APK Files to 'apk' Folder
         run: mv build/app/outputs/flutter-apk/app-debug.apk apk/
-
-  commit_and_push:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v2
 
       - name: List Changed Files
         run: git status
