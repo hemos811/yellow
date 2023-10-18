@@ -70,11 +70,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set Git User
-        run: |
-          git config user.name "Your Name"
-          git config user.email "youremail@example.com"
-
       - name: Check if package name has changed
         id: check-package-change
         run: |
@@ -86,13 +81,16 @@ jobs:
             echo "::set-output name=package_changed::false"
           fi
 
+      - name: List Changed Files
+        run: git status
+
+      - name: List Staged Files
+        run: git diff --cached --name-only
+
       - name: Commit and Push Changes
         run: |
-          if [[ ${{ steps.check-package-change.outputs.package_changed }} == 'true' ]]; then
-            git add .
-            git commit -m "Change package name to $PACKAGE_NAME"
-          else
-            git add apk/*.apk
-            git commit -m "APK Generation"
-          fi
+          git add .
+          git status  # Added for debugging
+          git diff --cached --name-only  # Added for debugging
+          git commit -m "Change package name to $PACKAGE_NAME" || echo "No changes to commit"
           git push

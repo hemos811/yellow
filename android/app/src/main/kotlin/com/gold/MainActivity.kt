@@ -1,4 +1,4 @@
-package com.example.magenta
+package com.gold
 
 import io.flutter.embedding.android.FlutterActivity
 
