@@ -1,45 +1,61 @@
 name: Build Flutter APK's and App bundle
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v3
-
-      # Set up Flutter.
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-      - run: flutter doctor -v
-
-      # Checkout the repository code and get packages.
-      - name: Checkout flutter_app code
-        uses: actions/checkout@v3
-      - run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --split-per-abi --release
-
-      - name: Build APP BUNDLE
-        run: flutter build appbundle
-
-      - name: Create Release
-        uses: ncipollo/release-action@v1.10.0
-        with:
-          artifacts: "build/app/outputs/apk/release/*.apk, build/app/outputs/bundle/release/*.aab"
-
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v3.1.0
-        with:
-          name: release-apk
-          path: build/app/outputs/apk/
-
 on:
   push:
     branches:
       - master
     tags:
       - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+      - run: flutter doctor -v
+
+      - name: Set up Gradle
+        run: |
+          echo "org.gradle.jvmargs=-Xmx2048m" >> $GITHUB_WORKSPACE/android/gradle.properties
+
+
+      - name: Checkout flutter_app code
+        uses: actions/checkout@v2
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Create 'apk' Folder if Not Exist
+        run: mkdir -p apk
+
+      - name: Build APK
+        run: flutter build apk --debug
+
+      - name: Move APK Files to 'apk' Folder
+        run: mv build/app/outputs/flutter-apk/app-debug.apk apk/
+
+      - name: Commit APKs to Repository
+        run: |
+          git config user.name "Your Name"
+          git config user.email "youremail@example.com"
+          git add apk/*.apk
+          git commit -m "Add APK files"
+          git push
+
+  access_apks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Access 'apk' Folder and APKs
+        run: |
+          # Create 'apk' folder if it doesn't exist
+          mkdir -p apk
+          
+          # Now you can access the 'apk' folder and APK files
+          ls apk/
