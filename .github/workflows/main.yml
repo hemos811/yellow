@@ -8,8 +8,38 @@ on:
       - 'package-name.txt' # Specify the path to the package name file
 
 jobs:
+  change_package_name:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Check if package-name.txt has changed
+        id: check-file-change
+        run: |
+          if git diff --quiet HEAD^ HEAD -- package-name.txt; then
+            echo "File 'package-name.txt' has not changed. Skipping package name change."
+            echo "::set-output name=changed::false"
+          else
+            echo "File 'package-name.txt' has changed. Proceeding with package name change."
+            echo "::set-output name=changed::true"
+          fi
+
+      - name: Read data from a file
+        if: steps.check-file-change.outputs.changed == 'true'
+        run: |
+          # Read the data from a file in your repository and store it as an environment variable
+          export PACKAGE_NAME=$(<package-name.txt)
+
+      - name: Change Flutter App Package Name
+        if: steps.check-file-change.outputs.changed == 'true'
+        run: |
+          # Use the stored environment variable to change the package name
+          flutter pub run change_app_package_name:main $PACKAGE_NAME
+
   build:
     runs-on: ubuntu-latest
+    needs: change_package_name
 
     steps:
       - uses: actions/checkout@v2
@@ -41,52 +71,36 @@ jobs:
       - name: Move APK Files to 'apk' Folder
         run: mv build/app/outputs/flutter-apk/app-debug.apk apk/
 
-      # Use a conditional check to skip these steps for specific tags
-      - name: Commit APKs to Repository
-        if: "!contains(github.ref, 'skip-apk-commit')"
-        run: |
-          git config user.name "Your Name"
-          git config user.email "youremail@example.com"
-          git add apk/*.apk
-          git commit -m "Add APK files"
-          git push
-
-  change_package_name:
+  commit_and_push:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [change_package_name, build]
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Check if package-name.txt has changed
-        id: check-file-change
+      - name: Set Git User
         run: |
-          if git diff --quiet HEAD^ HEAD -- package-name.txt; then
-            echo "File 'package-name.txt' has not changed. Skipping package name change."
-            echo "::set-output name=changed::false"
-          else
-            echo "File 'package-name.txt' has changed. Proceeding with package name change."
-            echo "::set-output name=changed::true"
-          fi
-
-      - name: Read data from a file
-        if: steps.check-file-change.outputs.changed == 'true'
-        run: |
-          # Read the data from a file in your repository and store it as an environment variable
-          export PACKAGE_NAME=$(<package-name.txt)
-
-      - name: Change Flutter App Package Name
-        if: steps.check-file-change.outputs.changed == 'true'
-        run: |
-          # Use the stored environment variable to change the package name
-          flutter pub run change_app_package_name:main $PACKAGE_NAME
-
-      - name: Commit and Push Changes
-        if: steps.check-file-change.outputs.changed == 'true'
-        run: |
-          # Commit and push the changes to your repository
           git config user.name "Your Name"
           git config user.email "youremail@example.com"
-          git add .
-          git commit -m "Change package name to $PACKAGE_NAME"
+
+      - name: Check if package name has changed
+        id: check-package-change
+        run: |
+          if [ -n "$PACKAGE_NAME" ]; then
+            echo "Package name has changed."
+            echo "::set-output name=package_changed::true"
+          else
+            echo "Package name has not changed."
+            echo "::set-output name=package_changed::false"
+          fi
+
+      - name: Commit and Push Changes
+        run: |
+          if [[ ${{ steps.check-package-change.outputs.package_changed }} == 'true' ]]; then
+            git add .
+            git commit -m "Change package name to $PACKAGE_NAME"
+          else
+            git add apk/*.apk
+            git commit -m "APK Generation"
+          fi
           git push
