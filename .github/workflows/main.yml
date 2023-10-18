@@ -45,8 +45,6 @@ jobs:
       - name: Read data from a file
         if: steps.check-file-change.outputs.changed == 'true'
         run: |
-          # Debug - List Repository Contents
-          ls -R
 
           # Debug - Check Package Name File
           cat package-name.txt
@@ -61,7 +59,7 @@ jobs:
           echo "PACKAGE_NAME is set to: $PACKAGE_NAME"
 
           # Use the stored environment variable to change the package name
-          flutter pub run change_app_package_name:main $PACKAGE_NAME
+          flutter pub run change_app_package_name:main com.example.purple
 
       - name: Build APK
         run: flutter build apk --debug
