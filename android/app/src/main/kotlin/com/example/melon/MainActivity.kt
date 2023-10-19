@@ -1,4 +1,4 @@
-package com.example.kiwi
+package com.example.melon
 
 import io.flutter.embedding.android.FlutterActivity
 
