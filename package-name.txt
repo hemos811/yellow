@@ -1,1 +1,1 @@
-com.example.kiwi
+com.example.melon
