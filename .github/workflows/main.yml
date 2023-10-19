@@ -21,6 +21,9 @@ jobs:
           channel: "stable"
       - run: flutter doctor -v
 
+      - name: Accept Android Licenses
+        run: yes | flutter doctor --android-licenses
+
       - name: Install Flutter dependencies
         run: 
           flutter clean
