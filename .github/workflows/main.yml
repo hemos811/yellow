@@ -19,10 +19,10 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-      - run: flutter doctor -v
-
-      - name: Accept Android Licenses
-        run: yes | flutter doctor --android-licenses
+          flutter-version: '3.13.6'
+      - run: 
+          yes | flutter doctor --android-licenses
+          flutter doctor -v
 
       - name: Install Flutter dependencies
         run: 
