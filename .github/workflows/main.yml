@@ -26,7 +26,6 @@ jobs:
 
       - name: Install Flutter dependencies
         run: 
-          flutter clean
           flutter pub get
 
       - name: Create 'apk' Folder if Not Exist
