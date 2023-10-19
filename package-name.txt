@@ -1,1 +1,1 @@
-com.example.melon
+com.example.apple
