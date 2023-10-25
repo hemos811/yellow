@@ -5,7 +5,13 @@ on:
     branches:
       - master
     paths:
-      - 'package-name.txt' # Specify the path to the package name file
+      - 'package-name.txt'
+  workflow_dispatch:
+    inputs:
+      package_name:
+        description: 'Custom package name for the build'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -35,31 +41,10 @@ jobs:
       - name: Create 'apk' Folder if Not Exist
         run: mkdir -p apk
 
-      - name: Check if package-name.txt has changed
-        id: check-file-change
+      - name: Use Input Value
         run: |
-          if git diff --quiet HEAD^ HEAD -- package-name.txt; then
-            echo "File 'package-name.txt' has not changed. Skipping package name change."
-            echo "::set-output name=changed::false"
-          else
-            echo "File 'package-name.txt' has changed. Proceeding with package name change."
-            echo "::set-output name=changed::true"
-          fi
-
-      - name: Read data from a file
-        if: steps.check-file-change.outputs.changed == 'true'
-        run: |
-          # Debug - Check Package Name File
-          cat package-name.txt
-        
-          # Read the data from a file in your repository and store it as an environment variable
-          export PACKAGE_NAME=$(<package-name.txt)
-          echo "PACKAGE_NAME is set to: ${PACKAGE_NAME}"
-          flutter pub run change_app_package_name:main $PACKAGE_NAME
-          git add .
-          git status
-          git branch
-          flutter doctor -v
+          PACKAGE_NAME="${{ inputs.package_name }}"
+          echo "Using package name provided in workflow dispatch: $PACKAGE_NAME"
             
       - name: Build APK
         run: flutter build apk --split-per-abi --release
