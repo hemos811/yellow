@@ -1,11 +1,7 @@
 name: Build Flutter APK's and App bundle
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - 'package-name.txt'
+
   workflow_dispatch:
     inputs:
       package_name:
