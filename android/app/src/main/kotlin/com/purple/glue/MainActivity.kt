@@ -1,4 +1,4 @@
-package com.yellow.claw
+package com.purple.glue
 
 import io.flutter.embedding.android.FlutterActivity
 
