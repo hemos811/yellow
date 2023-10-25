@@ -1,4 +1,4 @@
-package com.example.apple
+package com.yellow.claw
 
 import io.flutter.embedding.android.FlutterActivity
 
