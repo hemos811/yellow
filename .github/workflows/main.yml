@@ -45,7 +45,12 @@ jobs:
         run: |
           PACKAGE_NAME="${{ inputs.package_name }}"
           echo "Using package name provided in workflow dispatch: $PACKAGE_NAME"
-            
+          flutter pub run change_app_package_name:main $PACKAGE_NAME
+          git add .
+          git status
+          git branch
+          flutter doctor -v
+                    
       - name: Build APK
         run: flutter build apk --split-per-abi --release
 
