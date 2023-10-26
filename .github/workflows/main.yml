@@ -45,6 +45,8 @@ jobs:
       - name: Create APK Config JSON
         run: |
           echo '{"package_name": "${{ inputs.package_name }}", "organization_code": "${{ inputs.organization_code }}" }' > apk.config.json
+          git config user.name "Coder"
+          git config user.email "gitCoder@example.com"
           git add apk.config.json
           git commit -m "Added apk.config.json"
           git push
@@ -76,8 +78,6 @@ jobs:
 
       - name: Commit APKs to Repository
         run: |
-          git config user.name "Coder"
-          git config user.email "gitCoder@example.com"
           git add apk/*.apk
           git commit -m "Added Changed APK files"
           git push
