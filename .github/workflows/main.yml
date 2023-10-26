@@ -1,11 +1,14 @@
 name: Build Flutter APK's and App bundle
 
 on:
-
   workflow_dispatch:
     inputs:
       package_name:
         description: 'Custom package name for the build'
+        required: true
+        type: string
+      organization_code:
+        description: 'Organization code for the build'
         required: true
         type: string
 
@@ -16,6 +19,7 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
+
       - uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
@@ -26,6 +30,7 @@ jobs:
         with:
           channel: "stable"
           flutter-version: '3.13.6'
+
       - run: 
           yes | flutter doctor --android-licenses
           flutter doctor -v
@@ -37,6 +42,16 @@ jobs:
       - name: Create 'apk' Folder if Not Exist
         run: mkdir -p apk
 
+      - name: Create APK Config JSON
+        run: |
+          echo '{"package_name": "${{ inputs.package_name }}", "organization_code": "${{ inputs.organization_code }}" }' > apk.config.json
+          git add apk.config.json
+          git commit -m "Added apk.config.json"
+          git push
+
+      - name: Show APK Config JSON File
+        run: cat apk.config.json
+
       - name: Use Input Value
         run: |
           PACKAGE_NAME="${{ inputs.package_name }}"
@@ -46,13 +61,13 @@ jobs:
           git status
           git branch
           flutter doctor -v
-                    
+
       - name: Build APK
         run: flutter build apk --split-per-abi --release
 
       - name: Move APK Files to 'apk' Folder
         run: mv build/app/outputs/apk/release/*.apk apk/
-     
+
       - name: List Changed Files
         run: git status
 
