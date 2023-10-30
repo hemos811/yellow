@@ -1,4 +1,4 @@
-package com.amazing.burgers
+package com.flipping.carrots
 
 import io.flutter.embedding.android.FlutterActivity
 
