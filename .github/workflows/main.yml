@@ -68,7 +68,7 @@ jobs:
           APP_NAME="${{ inputs.app_name }}"
           echo "Using package name provided in workflow dispatch: $PACKAGE_NAME"
           echo "Using app name provided in workflow dispatch: $APP_NAME"
-          flutter pub run rename_app:main --appname="$APP_NAME"
+          dart run rename_app:main all="$APP_NAME"
           flutter pub run change_app_package_name:main "$PACKAGE_NAME"
           git add .
           git status
