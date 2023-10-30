@@ -11,6 +11,10 @@ on:
         description: 'Organization code for the build'
         required: true
         type: string
+      app_name:
+        description: 'New app name'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -44,7 +48,11 @@ jobs:
 
       - name: Create APK Config JSON
         run: |
-          echo '{"package_name": "${{ inputs.package_name }}", "organization_code": "${{ inputs.organization_code }}" }' > apk.config.json
+          echo '{
+            "package_name": "${{ inputs.package_name }}",
+            "organization_code": "${{ inputs.organization_code }}",
+            "app_name": "${{ inputs.app_name }}"
+          }' > apk.config.json
           git config user.name "Coder"
           git config user.email "gitCoder@example.com"
           git add apk.config.json
@@ -54,11 +62,14 @@ jobs:
       - name: Show APK Config JSON File
         run: cat apk.config.json
 
-      - name: Use Input Value
+      - name: Use Input Values
         run: |
           PACKAGE_NAME="${{ inputs.package_name }}"
+          APP_NAME="${{ inputs.app_name }}"
           echo "Using package name provided in workflow dispatch: $PACKAGE_NAME"
-          flutter pub run change_app_package_name:main $PACKAGE_NAME
+          echo "Using app name provided in workflow dispatch: $APP_NAME"
+          flutter pub run rename_app:main --appname="$APP_NAME"
+          flutter pub run change_app_package_name:main "$PACKAGE_NAME"
           git add .
           git status
           git branch
