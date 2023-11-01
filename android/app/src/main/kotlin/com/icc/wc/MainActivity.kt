@@ -1,4 +1,4 @@
-package com.flipping.carrots
+package com.icc.wc
 
 import io.flutter.embedding.android.FlutterActivity
 
