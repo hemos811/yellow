@@ -75,6 +75,9 @@ jobs:
           git branch
           flutter doctor -v
 
+      - name: Create a Downloads Directory
+        run: mkdir -p downloads
+
       - name: Build APK
         run: flutter build apk --split-per-abi --release
 
@@ -92,3 +95,32 @@ jobs:
           git add apk/*.apk
           git commit -m "Added Changed APK files"
           git push
+      
+      - name: Upload APK Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: apks
+          path: apk/*.apk
+          retention-days: 5
+
+      - name: Download Specific APK File
+        uses: actions/download-artifact@v2
+        with:
+          name: apks
+          path: downloads/
+
+      - name: Send email with Specific APK File
+        uses: dawidd6/action-send-mail@v2
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: 811.hemanthkumar@gmail.com
+          password: ${{ secrets.TUNNEL_MAIL }}
+          subject: Specific APK Build on ${{ github.repository }}: Success
+          body: |
+              Workflow: ${{ github.workflow }}
+              Repository: ${{ github.repository }}
+              Status: Success
+          to: 811.hemanthkumar@gmail.com
+          from: 811.hemanthkumar@gmail.com
+          attachments: downloads/app-x86_64-release.apk
