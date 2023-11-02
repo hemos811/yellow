@@ -1,4 +1,4 @@
-package com.icc.wc
+package com.dun.ki
 
 import io.flutter.embedding.android.FlutterActivity
 
