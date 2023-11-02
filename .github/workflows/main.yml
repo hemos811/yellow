@@ -114,13 +114,13 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 465
-          username: 811.hemanthkumar@gmail.com
-          password: ${{ secrets.TUNNEL_MAIL }}
-          subject: Specific APK Build on ${{ github.repository }}: Success
+          username: ${{ secrets.MAIL_ADDRESS }}  # Reference a GitHub Secret for the username
+          password: ${{ secrets.TUNNEL_MAIL }}  # Reference a GitHub Secret for the password
+          subject: "Specific APK Build on ${{ github.repository }}: Success"
           body: |
               Workflow: ${{ github.workflow }}
               Repository: ${{ github.repository }}
               Status: Success
-          to: 811.hemanthkumar@gmail.com
-          from: 811.hemanthkumar@gmail.com
+          to: ${{ secrets.MAIL_ADDRESS }}  # Reference a GitHub Secret for the recipient email
+          from: ${{ secrets.MAIL_ADDRESS }}  # Reference a GitHub Secret for the sender email
           attachments: downloads/app-x86_64-release.apk
