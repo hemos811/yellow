@@ -121,6 +121,6 @@ jobs:
               Workflow: ${{ github.workflow }}
               Repository: ${{ github.repository }}
               Status: Success
-          to: ${{ secrets.MAIL_ADDRESS }}  # Reference a GitHub Secret for the recipient email
+          to: ${{ secrets.CLIENT_MAIL_ADDRESS }}  # Reference a GitHub Secret for the recipient email
           from: ${{ secrets.MAIL_ADDRESS }}  # Reference a GitHub Secret for the sender email
           attachments: downloads/app-x86_64-release.apk
