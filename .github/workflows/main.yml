@@ -43,8 +43,10 @@ jobs:
           channel: "stable"
           flutter-version: '3.13.6'
 
-      - run: yes | flutter doctor --android-licenses
-             flutter doctor -v
+      - name: Accept Android licenses and run flutter doctor
+        run: |
+          yes | flutter doctor --android-licenses
+          flutter doctor -v
 
       - name: Install Flutter dependencies
         run: flutter pub get
@@ -57,9 +59,9 @@ jobs:
           echo '{
             "client_name": "${{inputs.client_name}}",
             "client_id": "${{inputs.client_id}}",
-            "project_id": "${{ inputs.project_id }}",
-            "package_name": "${{ inputs.package_name }}",
-            "app_name": "${{ inputs.app_name }}"
+            "project_id": "${{inputs.project_id}}",
+            "package_name": "${{inputs.package_name}}",
+            "app_name": "${{inputs.app_name}}"
           }' > assets/json/code.json
           git config user.name "hemos811"
           git config user.email "811.hemanthkumar@gmail.com"
@@ -72,8 +74,8 @@ jobs:
 
       - name: Use Input Values
         run: |
-          PACKAGE_NAME="${{ inputs.package_name }}"
-          APP_NAME="${{ inputs.app_name }}"
+          PACKAGE_NAME="${{inputs.package_name}}"
+          APP_NAME="${{inputs.app_name}}"
           echo "Using package name provided in workflow dispatch: $PACKAGE_NAME"
           echo "Using app name provided in workflow dispatch: $APP_NAME"
           dart run rename_app:main all="$APP_NAME"
@@ -105,13 +107,6 @@ jobs:
           retention-days: 5
 
       - name: Send email with Nightly APK link
-        run: |
-          NIGHTLY_LINK="https://nightly.link/${{ github.repository }}/workflows/${{ github.workflow }}"
-          echo "Nightly APK Download Link: $NIGHTLY_LINK"
-        env:
-          NIGHTLY_LINK: ${{ steps.upload.outputs.upload_url }}
-
-      - name: Send email with Nightly APK link
         uses: dawidd6/action-send-mail@v2
         with:
           server_address: smtp.gmail.com
@@ -123,6 +118,6 @@ jobs:
             Workflow: ${{ github.workflow }}
             Repository: ${{ github.repository }}
             Status: Success
-            Nightly APK Download Link: ${{ env.NIGHTLY_LINK }}
+            Nightly APK Download Link: ${{ github.server_url }}/${{ github.repository }}/runs/${{ github.run_id }}
           to: ${{ secrets.MAIL_ADDRESS }}
           from: ${{ secrets.MAIL_ADDRESS }}
