@@ -23,10 +23,6 @@ on:
         description: 'App Name/Label'
         required: true
         type: string
-      branch:
-        description: 'Branch name for nightly build (e.g., main)'
-        required: true
-        type: string
 
 jobs:
   build:
@@ -78,10 +74,8 @@ jobs:
         run: |
           PACKAGE_NAME="${{ inputs.package_name }}"
           APP_NAME="${{ inputs.app_name }}"
-          BRANCH_NAME="${{ inputs.branch }}"
           echo "Using package name provided in workflow dispatch: $PACKAGE_NAME"
           echo "Using app name provided in workflow dispatch: $APP_NAME"
-          echo "Using branch name provided in workflow dispatch: $BRANCH_NAME"
           dart run rename_app:main all="$APP_NAME"
           flutter pub run change_app_package_name:main "$PACKAGE_NAME"
 
@@ -90,15 +84,6 @@ jobs:
 
       - name: Move APK Files to 'apk' Folder
         run: mv build/app/outputs/apk/release/*.apk apk/
-
-      - name: Upload APKs to nightly.link
-        run: |
-          for apk_file in apk/*.apk; do
-            response=$(curl -X POST -F "file=@$apk_file" -F "version=${{ github.run_number }}" \
-              -F "slug=${{ github.repository }}" -F "branch=$BRANCH_NAME" \
-              https://nightly.link/upload/)
-            echo "Upload response for $apk_file: $response"
-          done
 
       - name: List Changed Files
         run: git status
@@ -112,19 +97,34 @@ jobs:
           git commit -m "Added Changed APK files"
           git push
 
-      - name: Send email with Nightly APK link
-        run: |
-          NIGHTLY_LINK="https://nightly.link/${{ github.repository }}/workflows/${{ github.workflow }}/${{ inputs.branch }}"
-          echo "Nightly APK Download Link: $NIGHTLY_LINK"
-        env:
-          NIGHTLY_LINK: ${{ steps.upload.outputs.upload_url }}
-
       - name: Upload APK Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: apks
           path: apk/*.apk
           retention-days: 5
+
+      - name: Download APK Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: apks
+  
+      - name: Upload APKs to nightly.link
+        run: |
+            for apk_file in apks/apk/*.apk; do
+              response=$(curl -X POST -F "file=@$apk_file" -F "version=${{ github.run_number }}" \
+                -F "slug=${{ github.repository }}" -F "branch=$GITHUB_REF" \
+                https://nightly.link/upload/)
+              echo "Upload response for $apk_file: $response"
+            done
+      
+            - name: Send email with Nightly APK link
+        run: |
+          NIGHTLY_LINK="https://nightly.link/${{ github.repository }}/workflows/${{ github.workflow }}"
+          echo "Nightly APK Download Link: $NIGHTLY_LINK"
+        env:
+          NIGHTLY_LINK: ${{ steps.upload.outputs.upload_url }}
+
 
       - name: Send email with Nightly APK link
         uses: dawidd6/action-send-mail@v2
@@ -135,10 +135,9 @@ jobs:
           password: ${{ secrets.TUNNEL_MAIL }}
           subject: "Nightly APK Build on ${{ github.repository }}: Success"
           body: |
-                Workflow: ${{ github.workflow }}
-                Repository: ${{ github.repository }}
-                Status: Success
-                Nightly APK Download Link: ${{ env.NIGHTLY_LINK }}
+            Workflow: ${{ github.workflow }}
+            Repository: ${{ github.repository }}
+            Status: Success
+            Nightly APK Download Link: ${{ env.NIGHTLY_LINK }}
           to: ${{ secrets.MAIL_ADDRESS }}
           from: ${{ secrets.MAIL_ADDRESS }}
-        
