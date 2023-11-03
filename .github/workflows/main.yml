@@ -118,6 +118,6 @@ jobs:
             Workflow: ${{ github.workflow }}
             Repository: ${{ github.repository }}
             Status: Success
-            Nightly APK Download Link: ${{ github.server_url }}/${{ github.repository }}/runs/${{ github.run_id }}
+            Nightly APK Download Link:  https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/apks.zip
           to: ${{ secrets.MAIL_ADDRESS }}
           from: ${{ secrets.MAIL_ADDRESS }}
