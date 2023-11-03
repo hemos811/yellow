@@ -1,4 +1,4 @@
-package com.dun.ki
+package com.dulin.pub
 
 import io.flutter.embedding.android.FlutterActivity
 
