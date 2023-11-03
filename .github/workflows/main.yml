@@ -118,7 +118,7 @@ jobs:
               echo "Upload response for $apk_file: $response"
             done
       
-            - name: Send email with Nightly APK link
+      - name: Send email with Nightly APK link
         run: |
           NIGHTLY_LINK="https://nightly.link/${{ github.repository }}/workflows/${{ github.workflow }}"
           echo "Nightly APK Download Link: $NIGHTLY_LINK"
