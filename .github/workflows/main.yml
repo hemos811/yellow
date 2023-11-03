@@ -104,31 +104,12 @@ jobs:
           path: apk/*.apk
           retention-days: 5
 
-      - name: Download and Extract APK Artifacts
-        uses: actions/download-artifact@v2
-        with:
-            name: apks
-  
-      - name: Unzip APK Artifacts
-        run: |
-            unzip -q apks/apks.zip -d apks/
-        working-directory: ${{ github.workspace }}
-  
-      - name: Upload APKs to nightly.link
-        run: |
-            for apk_file in apks/apk/*.apk; do
-              response=$(curl -X POST -F "file=@$apk_file" -F "version=${{ github.run_number }}" \
-                -F "slug=${{ github.repository }}" -F "branch=$GITHUB_REF" \
-                https://nightly.link/upload/)
-              echo "Upload response for $apk_file: $response"
-            done
       - name: Send email with Nightly APK link
         run: |
           NIGHTLY_LINK="https://nightly.link/${{ github.repository }}/workflows/${{ github.workflow }}"
           echo "Nightly APK Download Link: $NIGHTLY_LINK"
         env:
           NIGHTLY_LINK: ${{ steps.upload.outputs.upload_url }}
-
 
       - name: Send email with Nightly APK link
         uses: dawidd6/action-send-mail@v2
