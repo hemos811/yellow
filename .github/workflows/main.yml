@@ -102,7 +102,7 @@ jobs:
           flutter pub run change_app_package_name:main "$PACKAGE_NAME"
 
       - name: Build APK
-        run: flutter build  --release
+        run: flutter build apk --release
       - name: Move APK Files to 'apk' Folder
         run: mv build/app/outputs/apk/release/*.apk apk/
 
