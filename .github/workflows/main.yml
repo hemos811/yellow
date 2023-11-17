@@ -27,6 +27,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PUB_CACHE: ${{ github.workspace }}/.pub-cache
 
     steps:
       - name: Check out the repository
@@ -37,8 +39,6 @@ jobs:
         with:
           channel: "stable"
           flutter-version: '3.13.6'
-        env:
-          PUB_CACHE: ${{ github.workspace }}/.pub-cache
 
       - name: Cache Flutter dependencies
         uses: actions/cache@v2
